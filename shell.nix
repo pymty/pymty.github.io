@@ -24,9 +24,10 @@ let
          then
            if name == "Nikola" then
              (value.overridePythonAttrs (p: {
-                       # add the ghp-import2 dependency and specify that we are skipping
-                       # the tests for Nikola
-                       propagatedBuildInputs = p.propagatedBuildInputs ++ [ ghp_import2 ];
+                       # ghp-import2 is required to use the nikola command 'github_deploy'
+                       # aiohttp/watchdog are required to use the nikola command 'auto'
+                       propagatedBuildInputs = with super;
+                          p.propagatedBuildInputs ++ [ aiohttp watchdog ghp_import2 ];
                        doInstallCheck = false;
                        doCheck = false; }))
            else # don't run the test suite on every python dependency
