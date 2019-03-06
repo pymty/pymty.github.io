@@ -13,8 +13,7 @@ DOCKERFILE=utils/Dockerfile
 
 
 dockerRun(){
-    docker run \
-           --mount="type=bind,src=$PWD,dst=/site" $TAG  $*
+    docker run --mount="type=bind,src=$PWD,dst=/site" $TAG  $*
 }
 
 
@@ -51,7 +50,11 @@ EOF
         dockerRun clean
         ;;
     "github_deploy")
-        dockerRun github_deploy
+        docker run \
+             --mount="type=bind,src=$PWD,dst=/site" \
+             --mount="type=bind,src=$HOME/.ssh,dst=/home/$USER/.ssh" \
+             $TAG  github_deploy
+
         ;;
     *)
         docker run \

@@ -9,8 +9,9 @@ RUN /env/bin/pip install Nikola[extras]
 ARG UID
 ARG GID
 ARG USER
-RUN useradd --home-dir /site --uid ${UID} --gid ${GID}  ${USER}
-RUN mkdir /site && chown ${UID}:${GID} /site
+RUN useradd --home-dir /home/${USER} --uid ${UID} --gid ${GID}  ${USER} && \
+    mkdir /site && chown ${UID}:${GID} /site && \
+    mkdir /home/${USER} && chown ${UID}:${GID} /home/${USER}
 WORKDIR /site
 COPY utils/entrypoint.sh /entrypoint.sh
 USER ${UID}:${GID}
