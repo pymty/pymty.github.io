@@ -14,8 +14,7 @@ DOCKERFILE=utils/Dockerfile
 
 dockerRun(){
     docker run \
-           --mount="type=bind,src=$PWD,dst=/site" \
-           --user="$(id -u):$(id -g)" $TAG  $*
+           --mount="type=bind,src=$PWD,dst=/site" $TAG  $*
 }
 
 
@@ -39,7 +38,11 @@ EOF
         ;;
 
     "build-image")
-        docker build --tag $TAG --file $DOCKERFILE .
+        docker build --tag $TAG \
+               --file $DOCKERFILE \
+               --build-arg UID=$(id -u) \
+               --build-arg GID=$(id -g) \
+               --build-arg USER=$USER .
         ;;
     "build-site")
         dockerRun build
