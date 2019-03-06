@@ -9,5 +9,8 @@ build:
 clean:
 	./utils/run.sh clean
 
+auto:
+	./utils/run.sh auto
+
 deploy:
 	./utils/run.sh github_deploy
