@@ -1,10 +1,13 @@
-all: clean build
+all: build-image clean build
+
+build-image:
+	./utils/run.sh build-image
 
 build:
-	nikola build
+	./utils/run.sh build-site
 
 clean:
-	nikola clean
+	./utils/run.sh clean
 
 deploy:
-	nikola github_deploy
+	./utils/run.sh github_deploy
