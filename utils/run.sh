@@ -10,23 +10,29 @@ fi
 
 TAG=pymty-site
 DOCKERFILE=utils/Dockerfile
-
+AUTO_PORT=8080
 
 dockerRun(){
-    docker run --mount="type=bind,src=$PWD,dst=/site" $TAG  $*
+    docker run --mount="type=bind,src=$PWD,dst=/site"  -ti $TAG  $*
 }
 
 
-
-case "$1" in
-    help|--help|-h)
-        cat <<EOF
+showHelp(){
+    cat <<EOF
 PyMTY run.sh
 -------------
      Options:
 
         help|--help|-h)
           Show this message.
+
+        auto)
+
+          Run nikola auto and export the port $AUTO_PORT.
+
+        bash)
+
+          Run a bash interactive session in the nikola container.
 
         build-image)
 
@@ -36,10 +42,28 @@ PyMTY run.sh
 
           Run nikola build inside the container with the correct mount points.
 
+        github_deploy)
+
+          Run nikola github_deploy on a container with a bind mounting your $HOME/.ssh into the container.
+
         - *)
           Pass the argments into the docker image entrypoint (after the dash).
 
 EOF
+}
+
+
+case "$1" in
+    help|--help|-h)
+        showHelp
+        ;;
+    "auto")
+        docker run \
+               --mount="type=bind,src=$PWD,dst=/site" \
+               -p $AUTO_PORT:$AUTO_PORT -ti $TAG  auto -a 0.0.0.0 -p $AUTO_PORT
+        ;;
+    "bash")
+        dockerRun bash
         ;;
 
     "build-image")
@@ -59,20 +83,20 @@ EOF
         docker run \
              --mount="type=bind,src=$PWD,dst=/site" \
              --mount="type=bind,src=$HOME/.ssh,dst=/home/$USER/.ssh" \
+             -ti \
              $TAG  github_deploy
 
         ;;
-    "auto")
-        docker run \
-               --mount="type=bind,src=$PWD,dst=/site" \
-               -ti \
-               -p 8080:8080 $TAG  auto -a 0.0.0.0 -p 8080
-        ;;
+
 
     -)
         shift
-        docker run \
-               --mount="type=bind,src=$PWD,dst=/site" \
-               --user="$(id -u):$(id -g)" -ti $TAG  $*
+        dockerRun $*
         ;;
+    *)
+        echo "==============================================" >&2
+        echo "Error: Invalid option" >&2
+        showHelp >&2
+        echo "==============================================" >&2
+        exit 1
 esac
